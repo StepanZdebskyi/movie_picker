@@ -9,16 +9,35 @@ const Login = ({ setIsAuthenticated }) => {
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault(); // Prevent form refresh
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(''); // Clear previous errors
 
-    // MOCK VALIDATION LOGIC
-    // You can change the accepted email/pass here
-    if (email === 'test@test.com' && password === '1234') {
-      setIsAuthenticated(true);
-      navigate('/');
-    } else {
-      setError('Invalid credentials');
+    try {
+      // Send request to your Node server
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Login Successful
+        console.log('Logged in as:', data.user.name);
+        localStorage.setItem('userName', data.user.name);
+        setIsAuthenticated(true);
+        navigate('/');
+      } else {
+        // Server returned an error (401)
+        setError(data.message || 'Login failed');
+      }
+    } catch (err) {
+      // Network error (Server is down)
+      setError('Server is not responding.');
     }
   };
 
