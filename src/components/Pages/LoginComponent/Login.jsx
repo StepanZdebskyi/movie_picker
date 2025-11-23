@@ -29,6 +29,8 @@ const Login = ({ setIsAuthenticated }) => {
         // Login Successful
         console.log('Logged in as:', data.user.name);
         localStorage.setItem('userName', data.user.name);
+        localStorage.setItem('userEmail', data.user.email);
+        retrieveWatchlist();
         setIsAuthenticated(true);
         navigate('/');
       } else {
@@ -38,6 +40,25 @@ const Login = ({ setIsAuthenticated }) => {
     } catch (err) {
       // Network error (Server is down)
       setError('Server is not responding.');
+    }
+  };
+
+  const retrieveWatchlist = async () => {
+    // 1. Get the current user's email
+    const email = localStorage.getItem('userEmail');
+    if (!email) return;
+
+    try {
+      // 2. Use the GET endpoint (Not POST!)
+      const response = await fetch(`http://localhost:5000/watchlist/${email}`);
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('watchlist', JSON.stringify(data.watchlist));
+        console.log(`Watchlist is retrieved for ${email}`);
+      }
+    } catch (error) {
+      console.error('Network error fetching watchlist:', error);
     }
   };
 
