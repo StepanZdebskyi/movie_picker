@@ -25,19 +25,16 @@ test_app:
     # Якщо тестів немає, команда не впаде завдяки "|| true"
     - npm test || echo "No tests specified"
 
-# 3. Сканування безпеки (Trivy)
+# Trivy скан
 trivy_scan:
   stage: security
   image:
-    name: aquasecurity/trivy:latest
+    name: ghcr.io/aquasecurity/trivy:latest
     entrypoint: ['']
   script:
     - echo "Scanning for vulnerabilities..."
-    # Скануємо поточну папку (fs .)
-    # Шукаємо тільки серйозні проблеми (HIGH, CRITICAL)
-    # --exit-code 0 означає "не зупиняти пайплайн, навіть якщо знайшли проблеми"
     - trivy fs . --severity HIGH,CRITICAL --format table --exit-code 0
-  allow_failure: true # Дозволяємо пайплайну йти далі, навіть якщо є вразливості
+  allow_failure: true
 
 # 4. Аналіз якості коду (SonarCloud)
 sonarqube-check:
