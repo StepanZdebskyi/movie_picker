@@ -15,15 +15,13 @@ import Login from './components/Pages/LoginComponent/Login'; // Import the new L
 
 const theme = createTheme();
 
-// 1. Create a Layout Component for authenticated pages
-// This ensures Header and Nav only show up when logged in
+// Layout for authenticated pages
 const AppLayout = () => {
   return (
     <>
       <MainPageHeader />
       <div className="App">
         <Container>
-          {/* Outlet renders the child route (Trending, Movies, etc.) */}
           <Outlet />
         </Container>
       </div>
@@ -32,7 +30,7 @@ const AppLayout = () => {
   );
 };
 
-// 2. Create a Protected Route wrapper
+// Protected Route Wrapper
 const ProtectedRoute = ({ isAuthenticated, children }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -41,25 +39,37 @@ const ProtectedRoute = ({ isAuthenticated, children }) => {
 };
 
 function App() {
-  // State to track login status
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  // FIX: Initialize state by checking sessionStorage directly
+  // This function runs only once when the app loads (or reloads)
+  const [isAuthenticated, setIsAuthenticated] = React.useState(() => {
+    const user = localStorage.getItem('userName');
+    return user !== null; // Returns true if user exists, false if not
+  });
 
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <Routes>
-          {/* PUBLIC ROUTE: Login */}
-          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+          {/* Public Route: Login */}
+          {/* If already logged in, redirect away from login page to home */}
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/" replace />
+              ) : (
+                <Login setIsAuthenticated={setIsAuthenticated} />
+              )
+            }
+          />
 
-          {/* PROTECTED ROUTES */}
-          {/* We wrap the AppLayout inside the protection check */}
+          {/* Protected Routes */}
           <Route
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
                 <AppLayout />
               </ProtectedRoute>
             }>
-            {/* These components will replace <Outlet /> in AppLayout */}
             <Route path="/" element={<Trending />} />
             <Route path="/movies" element={<Movies />} />
             <Route path="/series" element={<Series />} />
