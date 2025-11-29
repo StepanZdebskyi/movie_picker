@@ -9,6 +9,7 @@ import './ContentModal.css';
 import Button from '@mui/material/Button';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import Carousel from '../Carousel/Carousel';
+import { API_BASE_URL } from '../config';
 
 const useStyles = makeStyles(() => ({
   modal: {
@@ -89,7 +90,7 @@ export default function TransitionsModal({ children, media_type, id }) {
     // 3. Send to Server FIRST
     if (userEmail) {
       try {
-        const response = await fetch('http://localhost:5000/watchlist', {
+        const response = await fetch(`${API_BASE_URL}/api/watchlist`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

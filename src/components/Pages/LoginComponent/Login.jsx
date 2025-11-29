@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, TextField, Typography, Box, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../config';
 
 const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ const Login = ({ setIsAuthenticated }) => {
 
     try {
       // Send request to your Node server
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ const Login = ({ setIsAuthenticated }) => {
 
     try {
       // 2. Use the GET endpoint (Not POST!)
-      const response = await fetch(`http://localhost:5000/watchlist/${email}`);
+      const response = await fetch(`${API_BASE_URL}/api/watchlist/${email}`);
       const data = await response.json();
 
       if (data.success) {
